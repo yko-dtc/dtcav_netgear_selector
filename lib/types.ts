@@ -42,6 +42,21 @@ export interface SelectorFilters {
   minimumSfpPlusCount: number;
 }
 
+export interface SelectorDraftFilters {
+  copperPortsNeeded: string;
+  poeRequired: boolean;
+  minimumPoeType: "" | PoeType;
+  minimumPoeBudget: string;
+  minimumSfpPlusCount: string;
+}
+
+export type SelectorDraftErrors = Partial<
+  Record<
+    "copperPortsNeeded" | "minimumPoeType" | "minimumPoeBudget" | "minimumSfpPlusCount",
+    string
+  >
+>;
+
 export interface RecommendationResult {
   switch: SwitchModel;
   score: number;

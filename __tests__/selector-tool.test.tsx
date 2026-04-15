@@ -1,19 +1,98 @@
+import { useState } from "react";
 import { fireEvent, render, screen, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { FilterPanel } from "@/components/filter-panel";
 import { SelectorTool } from "@/components/selector-app";
 import { SwitchCard } from "@/components/switch-card";
 import { switches } from "@/data/switches";
-import { defaultFilters } from "@/lib/types";
+import { defaultFilters, type SelectorDraftErrors, type SelectorDraftFilters } from "@/lib/types";
 
 describe("selector UI", () => {
   const noop = () => {};
+  const emptyErrors: SelectorDraftErrors = {};
+
+  function buildDraftFilters(
+    overrides: Partial<SelectorDraftFilters> = {},
+  ): SelectorDraftFilters {
+    return {
+      copperPortsNeeded: String(defaultFilters.copperPortsNeeded),
+      poeRequired: defaultFilters.poeRequired,
+      minimumPoeType: defaultFilters.minimumPoeType,
+      minimumPoeBudget: String(defaultFilters.minimumPoeBudget),
+      minimumSfpPlusCount: String(defaultFilters.minimumSfpPlusCount),
+      ...overrides,
+    };
+  }
+
+  function EditableFilterPanel() {
+    const [draftFilters, setDraftFilters] = useState<SelectorDraftFilters>(
+      buildDraftFilters({
+        copperPortsNeeded: "",
+        minimumPoeType: "",
+        minimumPoeBudget: "",
+      }),
+    );
+
+    return (
+      <FilterPanel
+        draftFilters={draftFilters}
+        errors={emptyErrors}
+        onNumberChange={(key, value) =>
+          setDraftFilters((current) => ({ ...current, [key]: value }))
+        }
+        onBooleanChange={(key, value) =>
+          setDraftFilters((current) => ({ ...current, [key]: value }))
+        }
+        onPoeTypeChange={(value) =>
+          setDraftFilters((current) => ({ ...current, minimumPoeType: value }))
+        }
+        onSubmit={noop}
+        onReset={() =>
+          setDraftFilters(
+            buildDraftFilters({
+              copperPortsNeeded: "",
+              minimumPoeType: "",
+              minimumPoeBudget: "",
+            }),
+          )
+        }
+      />
+    );
+  }
+
+  it("shows a prompt before a search has been submitted", () => {
+    render(
+      <SelectorTool
+        draftFilters={buildDraftFilters({
+          copperPortsNeeded: "",
+          minimumPoeType: "",
+          minimumPoeBudget: "",
+        })}
+        errors={emptyErrors}
+        appliedFilters={null}
+        onNumberChange={noop}
+        onBooleanChange={noop}
+        onPoeTypeChange={noop}
+        onSubmit={noop}
+        onReset={noop}
+      />,
+    );
+
+    expect(screen.getByText("Enter the request details to see a recommendation.")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Find Best Match" })).toBeInTheDocument();
+    expect(screen.queryByText("Recommended")).not.toBeInTheDocument();
+  });
 
   it("shows a best match and alternate matches for the default view", () => {
     render(
       <SelectorTool
-        filters={defaultFilters}
+        draftFilters={buildDraftFilters()}
+        errors={emptyErrors}
+        appliedFilters={defaultFilters}
         onNumberChange={noop}
         onBooleanChange={noop}
         onPoeTypeChange={noop}
+        onSubmit={noop}
         onReset={noop}
       />,
     );
@@ -27,7 +106,12 @@ describe("selector UI", () => {
   it("surfaces the 8-port exception when the filters allow it", () => {
     render(
       <SelectorTool
-        filters={{
+        draftFilters={buildDraftFilters({
+          copperPortsNeeded: "6",
+          minimumPoeBudget: "200",
+        })}
+        errors={emptyErrors}
+        appliedFilters={{
           ...defaultFilters,
           copperPortsNeeded: 6,
           minimumPoeBudget: 200,
@@ -36,6 +120,7 @@ describe("selector UI", () => {
         onNumberChange={noop}
         onBooleanChange={noop}
         onPoeTypeChange={noop}
+        onSubmit={noop}
         onReset={noop}
       />,
     );
@@ -48,6 +133,23 @@ describe("selector UI", () => {
     expect(
       within(recommendationSection as HTMLElement).getByText("M4250-8G2XF-PoE+"),
     ).toBeInTheDocument();
+  });
+
+  it("lets the copper ports field be cleared and typed into", async () => {
+    const user = userEvent.setup();
+
+    render(<EditableFilterPanel />);
+
+    const copperInput = screen.getByLabelText("Copper ports needed");
+
+    await user.type(copperInput, "24");
+    expect(copperInput).toHaveValue(24);
+
+    await user.clear(copperInput);
+    expect((copperInput as HTMLInputElement).value).toBe("");
+
+    await user.type(copperInput, "48");
+    expect(copperInput).toHaveValue(48);
   });
 
   it("renders the image placeholder when an image fails to load", () => {
@@ -87,10 +189,13 @@ describe("selector UI", () => {
   it("does not show a core / aggregation section in the streamlined selector", () => {
     render(
       <SelectorTool
-        filters={defaultFilters}
+        draftFilters={buildDraftFilters()}
+        errors={emptyErrors}
+        appliedFilters={defaultFilters}
         onNumberChange={noop}
         onBooleanChange={noop}
         onPoeTypeChange={noop}
+        onSubmit={noop}
         onReset={noop}
       />,
     );
@@ -101,10 +206,13 @@ describe("selector UI", () => {
   it("keeps the excluded models list collapsed by default", () => {
     render(
       <SelectorTool
-        filters={defaultFilters}
+        draftFilters={buildDraftFilters()}
+        errors={emptyErrors}
+        appliedFilters={defaultFilters}
         onNumberChange={noop}
         onBooleanChange={noop}
         onPoeTypeChange={noop}
+        onSubmit={noop}
         onReset={noop}
       />,
     );

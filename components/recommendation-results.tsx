@@ -4,14 +4,31 @@ import { getRecommendationBanner } from "@/lib/ranking";
 import type { RecommendationBuckets, SelectorFilters } from "@/lib/types";
 
 interface RecommendationResultsProps {
-  buckets: RecommendationBuckets;
-  filters: SelectorFilters;
+  buckets: RecommendationBuckets | null;
+  filters: SelectorFilters | null;
 }
 
 export function RecommendationResults({
   buckets,
   filters,
 }: RecommendationResultsProps) {
+  if (!buckets || !filters) {
+    return (
+      <section className="rounded-[32px] border border-dashed border-slate-700 bg-slate-950/50 p-6 shadow-[0_24px_80px_rgba(2,6,23,0.3)] backdrop-blur-xl">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-sky-200/60">
+          Ready when you are
+        </p>
+        <h2 className="mt-2 font-[family-name:var(--font-display)] text-[2rem] font-semibold tracking-tight text-slate-50">
+          Enter the request details to see a recommendation.
+        </h2>
+        <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-300">
+          Start with copper ports needed, minimum PoE type, and minimum PoE budget,
+          then click Find Best Match.
+        </p>
+      </section>
+    );
+  }
+
   const bestMatch = buckets.recommended[0];
 
   return (
