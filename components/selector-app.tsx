@@ -79,6 +79,10 @@ const blankDraftFilters: SelectorDraftFilters = {
   minimumSfpPlusCount: String(defaultFilters.minimumSfpPlusCount),
 };
 
+type ParsedNumberResult =
+  | { success: true; value: number }
+  | { success: false; error: string };
+
 function toDraftFilters(filters: SelectorFilters): SelectorDraftFilters {
   return {
     copperPortsNeeded: String(filters.copperPortsNeeded),
@@ -98,32 +102,37 @@ function parseRequiredNumber(
   fieldLabel: string,
   min: number,
   max: number,
-) {
+): ParsedNumberResult {
   if (value.trim() === "") {
-    return { error: `Add ${fieldLabel}.` };
+    return { success: false, error: `Add ${fieldLabel}.` };
   }
 
   const parsed = Number(value);
 
   if (!Number.isFinite(parsed) || parsed < min || parsed > max) {
-    return { error: `${fieldLabel} must be between ${min} and ${max}.` };
+    return { success: false, error: `${fieldLabel} must be between ${min} and ${max}.` };
   }
 
-  return { value: parsed };
+  return { success: true, value: parsed };
 }
 
-function parseOptionalNumber(value: string, fieldLabel: string, min: number, max: number) {
+function parseOptionalNumber(
+  value: string,
+  fieldLabel: string,
+  min: number,
+  max: number,
+): ParsedNumberResult {
   if (value.trim() === "") {
-    return { value: min };
+    return { success: true, value: min };
   }
 
   const parsed = Number(value);
 
   if (!Number.isFinite(parsed) || parsed < min || parsed > max) {
-    return { error: `${fieldLabel} must be between ${min} and ${max}.` };
+    return { success: false, error: `${fieldLabel} must be between ${min} and ${max}.` };
   }
 
-  return { value: parsed };
+  return { success: true, value: parsed };
 }
 
 function buildAppliedFilters(draftFilters: SelectorDraftFilters) {
@@ -141,11 +150,11 @@ function buildAppliedFilters(draftFilters: SelectorDraftFilters) {
     16,
   );
 
-  if (copperPortsNeeded.error) {
+  if (!copperPortsNeeded.success) {
     errors.copperPortsNeeded = copperPortsNeeded.error;
   }
 
-  if (minimumSfpPlusCount.error) {
+  if (!minimumSfpPlusCount.success) {
     errors.minimumSfpPlusCount = minimumSfpPlusCount.error;
   }
 
@@ -166,14 +175,14 @@ function buildAppliedFilters(draftFilters: SelectorDraftFilters) {
       10000,
     );
 
-    if (parsedBudget.error) {
+    if (!parsedBudget.success) {
       errors.minimumPoeBudget = parsedBudget.error;
     } else {
       minimumPoeBudget = parsedBudget.value;
     }
   }
 
-  if (Object.keys(errors).length > 0 || copperPortsNeeded.value === undefined) {
+  if (Object.keys(errors).length > 0 || !copperPortsNeeded.success || !minimumSfpPlusCount.success) {
     return { errors };
   }
 
@@ -183,7 +192,7 @@ function buildAppliedFilters(draftFilters: SelectorDraftFilters) {
       poeRequired: draftFilters.poeRequired,
       minimumPoeType,
       minimumPoeBudget,
-      minimumSfpPlusCount: minimumSfpPlusCount.value ?? 0,
+      minimumSfpPlusCount: minimumSfpPlusCount.value,
     },
     errors: {},
   };
