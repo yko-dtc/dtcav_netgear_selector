@@ -31,7 +31,7 @@ export default function RootLayout({
       >
         <div className="min-h-screen">
           <Header />
-          <main className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
+          <main className="mx-auto w-full max-w-[min(96vw,1800px)] px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
             {children}
           </main>
         </div>
@@ -39,4 +39,3 @@ export default function RootLayout({
     </html>
   );
 }
-

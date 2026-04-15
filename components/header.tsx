@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -16,16 +17,28 @@ export function Header() {
     <header className="sticky top-0 z-20 border-b border-slate-800/80 bg-slate-950/80 backdrop-blur-xl">
       <div className="mx-auto flex w-full max-w-7xl flex-col gap-5 px-4 py-5 sm:px-6 lg:px-8">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-          <div className="max-w-3xl">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-sky-200/60">
-              Internal AV Engineering Tool
-            </p>
-            <h1 className="mt-2 font-[family-name:var(--font-display)] text-3xl font-semibold tracking-tight text-slate-50 sm:text-4xl">
-              Netgear AV Line Switch Selector
-            </h1>
-            <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-300 sm:text-base">
-              Clean, fast access-layer guidance for commercial AV-over-IP rooms and racks.
-            </p>
+          <div className="flex items-start gap-4 sm:gap-5">
+            <div className="relative h-[4.5rem] w-[6.5rem] shrink-0 sm:h-[5.25rem] sm:w-[7.75rem]">
+              <Image
+                src="/dtcav_white.png"
+                alt="DTC AV"
+                fill
+                priority
+                className="object-contain object-left"
+                sizes="(min-width: 640px) 96px, 80px"
+              />
+            </div>
+            <div className="max-w-3xl">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-sky-200/60">
+                Internal AV Engineering Tool
+              </p>
+              <h1 className="mt-2 font-[family-name:var(--font-display)] text-3xl font-semibold tracking-tight text-slate-50 sm:text-4xl">
+                Netgear AV Line Switch Selector
+              </h1>
+              <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-300 sm:text-base">
+                Clean, fast access-layer guidance for commercial AV-over-IP rooms and racks.
+              </p>
+            </div>
           </div>
           <nav className="flex flex-wrap gap-2">
             {navItems.map((item) => {

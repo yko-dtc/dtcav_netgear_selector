@@ -31,7 +31,7 @@ export function SelectorTool({
   const buckets = useMemo(() => rankSwitches(switches, deferredFilters), [deferredFilters]);
 
   return (
-    <div className="grid gap-6 xl:grid-cols-[340px_minmax(0,1fr)]">
+    <div className="grid gap-6 xl:grid-cols-[minmax(260px,22vw)_minmax(0,1fr)] xl:justify-center xl:gap-8 2xl:grid-cols-[minmax(260px,20vw)_minmax(0,1fr)]">
       <div className="xl:sticky xl:top-6 xl:self-start">
         <FilterPanel
           filters={filters}

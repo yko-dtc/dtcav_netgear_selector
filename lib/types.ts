@@ -62,6 +62,6 @@ export const defaultFilters: SelectorFilters = {
   copperPortsNeeded: 24,
   poeRequired: true,
   minimumPoeType: "PoE+",
-  minimumPoeBudget: 300,
-  minimumSfpPlusCount: 4,
+  minimumPoeBudget: 150,
+  minimumSfpPlusCount: 2,
 };
