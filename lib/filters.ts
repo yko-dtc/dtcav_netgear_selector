@@ -6,15 +6,31 @@ export const poeRank = {
   "PoE++": 2,
 } as const;
 
-const booleanKeys = new Set<keyof SelectorFilters>([
+type BooleanFilterKey = {
+  [K in keyof SelectorFilters]: SelectorFilters[K] extends boolean ? K : never;
+}[keyof SelectorFilters];
+
+type NumberFilterKey = {
+  [K in keyof SelectorFilters]: SelectorFilters[K] extends number ? K : never;
+}[keyof SelectorFilters];
+
+const booleanKeys = new Set<BooleanFilterKey>([
   "poeRequired",
 ]);
 
-const numberKeys = new Set<keyof SelectorFilters>([
+const numberKeys = new Set<NumberFilterKey>([
   "copperPortsNeeded",
   "minimumPoeBudget",
   "minimumSfpPlusCount",
 ]);
+
+function isBooleanFilterKey(key: keyof SelectorFilters): key is BooleanFilterKey {
+  return booleanKeys.has(key as BooleanFilterKey);
+}
+
+function isNumberFilterKey(key: keyof SelectorFilters): key is NumberFilterKey {
+  return numberKeys.has(key as NumberFilterKey);
+}
 
 export function getAccessCopperPorts(switchModel: SwitchModel) {
   return switchModel.copper1G + switchModel.copperMultigig;
@@ -94,16 +110,16 @@ export function parseFilters(
       continue;
     }
 
-    if (booleanKeys.has(key)) {
-      filters[key] = (rawValue === "true") as SelectorFilters[typeof key];
+    if (isBooleanFilterKey(key)) {
+      filters[key] = rawValue === "true";
       continue;
     }
 
-    if (numberKeys.has(key)) {
+    if (isNumberFilterKey(key)) {
       const parsed = Number(rawValue);
 
       if (Number.isFinite(parsed) && parsed >= 0) {
-        filters[key] = parsed as SelectorFilters[typeof key];
+        filters[key] = parsed;
       }
 
       continue;
