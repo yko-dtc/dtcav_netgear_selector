@@ -83,6 +83,10 @@ type ParsedNumberResult =
   | { success: true; value: number }
   | { success: false; error: string };
 
+type AppliedFiltersResult =
+  | { success: true; filters: SelectorFilters; errors: SelectorDraftErrors }
+  | { success: false; errors: SelectorDraftErrors };
+
 function toDraftFilters(filters: SelectorFilters): SelectorDraftFilters {
   return {
     copperPortsNeeded: String(filters.copperPortsNeeded),
@@ -135,7 +139,7 @@ function parseOptionalNumber(
   return { success: true, value: parsed };
 }
 
-function buildAppliedFilters(draftFilters: SelectorDraftFilters) {
+function buildAppliedFilters(draftFilters: SelectorDraftFilters): AppliedFiltersResult {
   const errors: SelectorDraftErrors = {};
   const copperPortsNeeded = parseRequiredNumber(
     draftFilters.copperPortsNeeded,
@@ -183,10 +187,11 @@ function buildAppliedFilters(draftFilters: SelectorDraftFilters) {
   }
 
   if (Object.keys(errors).length > 0 || !copperPortsNeeded.success || !minimumSfpPlusCount.success) {
-    return { errors };
+    return { success: false, errors };
   }
 
   return {
+    success: true,
     filters: {
       copperPortsNeeded: copperPortsNeeded.value,
       poeRequired: draftFilters.poeRequired,
@@ -281,7 +286,7 @@ export function SelectorApp() {
   function handleSubmit() {
     const nextState = buildAppliedFilters(draftFilters);
 
-    if (!("filters" in nextState)) {
+    if (!nextState.success) {
       setErrors(nextState.errors);
       return;
     }

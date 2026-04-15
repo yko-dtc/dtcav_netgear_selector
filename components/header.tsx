@@ -18,7 +18,11 @@ export function Header() {
       <div className="mx-auto flex w-full max-w-7xl flex-col gap-3 px-4 py-3 sm:gap-5 sm:px-6 sm:py-5 lg:px-8">
         <div className="flex flex-col gap-3 sm:gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div className="flex items-center gap-3 sm:items-start sm:gap-5">
-            <div className="relative h-12 w-[4.5rem] shrink-0 sm:h-[5.25rem] sm:w-[7.75rem]">
+            <Link
+              href="/"
+              aria-label="Go to home page"
+              className="relative h-12 w-[4.5rem] shrink-0 sm:h-[5.25rem] sm:w-[7.75rem]"
+            >
               <Image
                 src="/dtcav_white.png"
                 alt="DTC AV"
@@ -27,7 +31,7 @@ export function Header() {
                 className="object-contain object-left"
                 sizes="(min-width: 640px) 124px, 72px"
               />
-            </div>
+            </Link>
             <div className="max-w-3xl">
               <p className="hidden text-[11px] font-semibold uppercase tracking-[0.28em] text-sky-200/60 sm:block">
                 Internal AV Engineering Tool
