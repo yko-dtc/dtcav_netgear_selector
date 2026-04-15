@@ -12,6 +12,59 @@ interface SwitchCardProps {
   summary?: string;
   variant?: "recommended" | "alternate" | "catalog" | "core";
   insightLabel?: string;
+  isSuitable?: boolean;
+}
+
+function CheckMarkIcon({ className = "h-4 w-4" }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 16 16"
+      aria-hidden="true"
+      className={`${className} text-emerald-400`}
+      fill="none"
+    >
+      <circle cx="8" cy="8" r="7" fill="currentColor" fillOpacity="0.16" stroke="currentColor" />
+      <path
+        d="M4.5 8.2 6.9 10.6 11.5 6"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.8"
+      />
+    </svg>
+  );
+}
+
+function CheckList({
+  items,
+  compact = false,
+}: {
+  items: string[];
+  compact?: boolean;
+}) {
+  if (items.length === 0) {
+    return null;
+  }
+
+  return (
+    <ul
+      className={
+        compact
+          ? "mt-4 grid gap-2 text-xs text-slate-200 sm:grid-cols-2"
+          : "mt-3 grid gap-2 text-sm text-slate-200 sm:grid-cols-2"
+      }
+    >
+      {items.map((item) => (
+        <li
+          key={item}
+          className="flex items-start gap-2 rounded-2xl border border-emerald-500/20 bg-emerald-500/10 px-3 py-2 leading-5"
+        >
+          <CheckMarkIcon className="mt-0.5 h-4 w-4 shrink-0" />
+          <span>{item}</span>
+        </li>
+      ))}
+    </ul>
+  );
 }
 
 function getBadgeConfig(model: SwitchModel) {
@@ -51,6 +104,7 @@ export function SwitchCard({
   summary,
   variant = "alternate",
   insightLabel = "Why this matched",
+  isSuitable = false,
 }: SwitchCardProps) {
   const [imageFailed, setImageFailed] = useState(false);
   const [modalImageFailed, setModalImageFailed] = useState(false);
@@ -102,6 +156,7 @@ export function SwitchCard({
   const accessCopper = model.copper1G + model.copperMultigig;
   const copperLabel =
     accessCopper > 0 ? `${accessCopper} copper` : `${model.copper10G} copper 10G`;
+  const previewChecks = matchReasons.slice(0, 4);
 
   return (
     <>
@@ -148,10 +203,20 @@ export function SwitchCard({
                     {model.series} | SKU {model.sku}
                   </p>
                 </div>
-                <span className="mt-1 rounded-full border border-slate-700 bg-slate-900 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-300">
-                  View Details
-                </span>
+                <div className="mt-1 flex shrink-0 flex-col items-end gap-2">
+                  {isSuitable ? (
+                    <span className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/12 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-200">
+                      <CheckMarkIcon className="h-4 w-4" />
+                      Suitable fit
+                    </span>
+                  ) : null}
+                  <span className="rounded-full border border-slate-700 bg-slate-900 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-300">
+                    View Details
+                  </span>
+                </div>
               </div>
+
+              <CheckList items={previewChecks} compact />
 
               <dl className="mt-4 grid grid-cols-3 gap-2 text-left">
                 <div className="rounded-2xl border border-slate-800 bg-slate-900/80 px-3 py-2">
@@ -284,11 +349,7 @@ export function SwitchCard({
                     <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-500">
                       {insightLabel}
                     </p>
-                    <ul className="mt-3 space-y-2 text-sm leading-6 text-slate-300">
-                      {matchReasons.map((reason) => (
-                        <li key={reason}>- {reason}</li>
-                      ))}
-                    </ul>
+                    <CheckList items={matchReasons} />
                   </div>
 
                   <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-4">

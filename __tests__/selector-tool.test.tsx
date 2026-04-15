@@ -21,6 +21,7 @@ describe("selector UI", () => {
     expect(screen.getByText("Recommended")).toBeInTheDocument();
     expect(screen.getByText("M4350-24G4XF")).toBeInTheDocument();
     expect(screen.getByText("Other approved fits")).toBeInTheDocument();
+    expect(screen.getAllByText("Suitable fit").length).toBeGreaterThan(0);
   });
 
   it("surfaces the 8-port exception when the filters allow it", () => {
@@ -53,8 +54,9 @@ describe("selector UI", () => {
     render(
       <SwitchCard
         model={switches[0]}
-        matchReasons={["Approved for compact installs."]}
+        matchReasons={["8 copper ports for 6 needed"]}
         watchOuts={[]}
+        isSuitable
       />,
     );
 
@@ -66,17 +68,20 @@ describe("selector UI", () => {
     render(
       <SwitchCard
         model={switches[0]}
-        matchReasons={["Approved for compact installs."]}
+        matchReasons={["8 copper ports for 6 needed", "PoE+ meets the required PoE type"]}
         watchOuts={["Front-facing exception for compact rooms."]}
         summary="Recommended: M4250-8G2XF-PoE+ because it fits compact rooms."
+        isSuitable
       />,
     );
 
     fireEvent.click(screen.getByRole("button", { name: /View details for M4250-8G2XF-PoE\+/i }));
 
-    expect(screen.getByRole("dialog")).toBeInTheDocument();
+    const dialog = screen.getByRole("dialog");
+    expect(dialog).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Close" })).toBeInTheDocument();
     expect(screen.getByText("Watch-outs")).toBeInTheDocument();
+    expect(within(dialog).getByText("PoE+ meets the required PoE type")).toBeInTheDocument();
   });
 
   it("does not show a core / aggregation section in the streamlined selector", () => {

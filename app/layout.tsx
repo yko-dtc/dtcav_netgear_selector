@@ -16,6 +16,11 @@ const displayFont = Space_Grotesk({
 export const metadata: Metadata = {
   title: "Netgear AV Line Selector",
   description: "Internal Netgear AV switch selector for commercial AV-over-IP deployments.",
+  icons: {
+    icon: "/netgear_logo_favicon.png",
+    shortcut: "/netgear_logo_favicon.png",
+    apple: "/netgear_logo_favicon.png",
+  },
 };
 
 export default function RootLayout({

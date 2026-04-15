@@ -112,7 +112,7 @@ function toRecommendationResult(
     summary: "",
   };
 
-  result.summary = buildRecommendationSummary(result);
+  result.summary = buildRecommendationSummary(result, filters);
   return result;
 }
 

@@ -49,6 +49,7 @@ export function RecommendationResults({
             watchOuts={bestMatch.watchOuts}
             summary={bestMatch.summary}
             variant="recommended"
+            isSuitable
           />
         ) : (
           <div className="rounded-[32px] border border-slate-800 bg-slate-950/70 p-6 shadow-[0_24px_80px_rgba(2,6,23,0.45)] backdrop-blur-xl">
@@ -82,6 +83,7 @@ export function RecommendationResults({
                 watchOuts={result.watchOuts}
                 summary={result.summary}
                 variant="alternate"
+                isSuitable
               />
             ))}
           </div>

@@ -35,7 +35,7 @@ export default function CatalogPage() {
             <SwitchCard
               key={switchModel.model}
               model={switchModel}
-              matchReasons={[buildCatalogNotes(switchModel)]}
+              matchReasons={buildCatalogNotes(switchModel)}
               watchOuts={switchModel.notes}
               variant="catalog"
               insightLabel="At a glance"
@@ -62,7 +62,7 @@ export default function CatalogPage() {
             <SwitchCard
               key={switchModel.model}
               model={switchModel}
-              matchReasons={[buildCatalogNotes(switchModel)]}
+              matchReasons={buildCatalogNotes(switchModel)}
               watchOuts={switchModel.notes}
               variant="core"
               insightLabel="At a glance"

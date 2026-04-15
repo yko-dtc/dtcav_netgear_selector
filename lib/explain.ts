@@ -17,42 +17,37 @@ export function buildRecommendationReasons(
   const requestedPortClass = getPreferredPortClass(filters.copperPortsNeeded);
   const switchPortClass = getSwitchPortClass(switchModel);
 
-  reasons.push(
-    `Meets the ${filters.copperPortsNeeded}-port request with ${availableCopperPorts} usable copper ports.`,
-  );
+  reasons.push(`${availableCopperPorts} copper ports for ${filters.copperPortsNeeded} needed`);
 
   if (filters.poeRequired) {
-    reasons.push(
-      `Supports ${switchModel.poeType} with up to ${switchModel.poeBudgetMaxWatts}W PoE budget.`,
-    );
+    reasons.push(`${switchModel.poeType} meets the required PoE type`);
+    reasons.push(`${switchModel.poeBudgetMaxWatts}W PoE budget clears ${filters.minimumPoeBudget}W`);
   }
 
   if (filters.minimumSfpPlusCount > 0) {
-    reasons.push(
-      `Provides ${switchModel.sfpPlus10G}x SFP+ uplinks for AV traffic transport between switches.`,
-    );
+    reasons.push(`${switchModel.sfpPlus10G}x SFP+ uplinks meet the minimum`);
   }
 
   if (switchModel.orientation === "rear-facing") {
-    reasons.push("Rear-facing copper ports align with the preferred AV rack orientation.");
+    reasons.push("Rear-facing layout matches the preferred rack orientation");
   } else if (canUseFrontFacingException(switchModel, filters)) {
-    reasons.push("Approved front-facing small-install exception is allowed for this request.");
+    reasons.push("Approved front-facing exception for compact installs");
   }
 
   if (switchModel.standardTier === "preferred") {
-    reasons.push("Falls inside the preferred standard access tier for commercial AV-over-IP work.");
+    reasons.push("Preferred approved access model");
   } else if (switchModel.standardTier === "standard") {
-    reasons.push("Stays within the standard approved access catalog.");
+    reasons.push("Approved standard access model");
   } else if (isSmallInstallExceptionModel(switchModel)) {
-    reasons.push("Represents the approved compact exception for very small installs.");
+    reasons.push("Approved compact exception model");
   }
 
   if (switchPortClass !== 0 && switchPortClass === requestedPortClass) {
-    reasons.push(`Matches the preferred ${requestedPortClass}-port class for this design size.`);
+    reasons.push(`${requestedPortClass}-port class fit`);
   }
 
   if (filters.copperPortsNeeded <= 8 && isSmallInstallExceptionModel(switchModel)) {
-    reasons.push("Automatically surfaced because the request falls into the compact small-room range.");
+    reasons.push("Auto-included for small-room requests");
   }
 
   return reasons;
@@ -85,9 +80,33 @@ export function buildWatchOuts(
   return Array.from(new Set(watchOuts));
 }
 
-export function buildRecommendationSummary(result: RecommendationResult) {
-  const coreReason = result.matchReasons.slice(0, 4).join(", ").replace(/\.$/, "");
-  return `Recommended: ${result.switch.model} because ${coreReason.toLowerCase()}.`;
+function formatRequirementList(filters: SelectorFilters) {
+  const requirements = ["port count"];
+
+  if (filters.poeRequired) {
+    requirements.push("PoE type", "PoE budget");
+  }
+
+  if (filters.minimumSfpPlusCount > 0) {
+    requirements.push("SFP+ uplinks");
+  }
+
+  if (requirements.length === 1) {
+    return requirements[0];
+  }
+
+  if (requirements.length === 2) {
+    return `${requirements[0]} and ${requirements[1]}`;
+  }
+
+  return `${requirements.slice(0, -1).join(", ")}, and ${requirements.at(-1)}`;
+}
+
+export function buildRecommendationSummary(
+  result: RecommendationResult,
+  filters: SelectorFilters,
+) {
+  return `Recommended: ${result.switch.model} because it clears the ${formatRequirementList(filters)} checks.`;
 }
 
 export function buildCatalogNotes(switchModel: SwitchModel) {
@@ -96,5 +115,12 @@ export function buildCatalogNotes(switchModel: SwitchModel) {
       ? `${getAccessCopperPorts(switchModel)} copper access ports`
       : `${switchModel.copper10G} copper 10G ports`;
 
-  return `${accessPorts}, ${switchModel.sfpPlus10G}x SFP+, ${switchModel.poeType}.`;
+  return [
+    accessPorts,
+    `${switchModel.sfpPlus10G}x SFP+ uplinks`,
+    switchModel.poeType === "None"
+      ? "No PoE"
+      : `${switchModel.poeType} with up to ${switchModel.poeBudgetMaxWatts}W`,
+    switchModel.orientation === "rear-facing" ? "Rear-facing layout" : "Front-facing layout",
+  ];
 }
