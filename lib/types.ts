@@ -40,11 +40,6 @@ export interface SelectorFilters {
   minimumPoeType: PoeType;
   minimumPoeBudget: number;
   minimumSfpPlusCount: number;
-  rearFacingOnly: boolean;
-  rj45Only: boolean;
-  multigigPreferred: boolean;
-  allowSmallInstallException: boolean;
-  includeCoreAggregation: boolean;
 }
 
 export interface RecommendationResult {
@@ -59,7 +54,6 @@ export interface RecommendationResult {
 export interface RecommendationBuckets {
   recommended: RecommendationResult[];
   alternates: RecommendationResult[];
-  coreMatches: RecommendationResult[];
   disqualified: RecommendationResult[];
   guidance: string | null;
 }
@@ -70,10 +64,4 @@ export const defaultFilters: SelectorFilters = {
   minimumPoeType: "PoE+",
   minimumPoeBudget: 300,
   minimumSfpPlusCount: 4,
-  rearFacingOnly: true,
-  rj45Only: true,
-  multigigPreferred: false,
-  allowSmallInstallException: false,
-  includeCoreAggregation: false,
 };
-

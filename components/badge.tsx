@@ -1,12 +1,12 @@
 import type { ReactNode } from "react";
 
 const toneClasses = {
-  preferred: "border-teal-700/20 bg-teal-700/10 text-teal-900",
-  standard: "border-slate-900/10 bg-white/80 text-slate-700",
-  exception: "border-amber-600/20 bg-amber-100 text-amber-900",
-  core: "border-sky-700/20 bg-sky-100 text-sky-900",
-  warning: "border-rose-700/20 bg-rose-100 text-rose-900",
-  neutral: "border-slate-900/10 bg-slate-900/5 text-slate-700",
+  preferred: "border-emerald-400/20 bg-emerald-400/10 text-emerald-200",
+  standard: "border-slate-700 bg-slate-900/70 text-slate-200",
+  exception: "border-amber-400/20 bg-amber-400/10 text-amber-200",
+  core: "border-sky-400/20 bg-sky-400/10 text-sky-200",
+  warning: "border-rose-400/20 bg-rose-400/10 text-rose-200",
+  neutral: "border-slate-700 bg-slate-900/70 text-slate-300",
 } as const;
 
 type BadgeTone = keyof typeof toneClasses;
@@ -25,4 +25,3 @@ export function Badge({ children, tone = "neutral" }: BadgeProps) {
     </span>
   );
 }
-

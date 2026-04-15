@@ -15,16 +15,7 @@ interface SelectorToolProps {
     key: "copperPortsNeeded" | "minimumPoeBudget" | "minimumSfpPlusCount",
     value: number,
   ) => void;
-  onBooleanChange: (
-    key:
-      | "poeRequired"
-      | "rearFacingOnly"
-      | "rj45Only"
-      | "multigigPreferred"
-      | "allowSmallInstallException"
-      | "includeCoreAggregation",
-    value: boolean,
-  ) => void;
+  onBooleanChange: (key: "poeRequired", value: boolean) => void;
   onPoeTypeChange: (value: SelectorFilters["minimumPoeType"]) => void;
   onReset: () => void;
 }

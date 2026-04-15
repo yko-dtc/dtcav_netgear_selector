@@ -17,27 +17,26 @@ describe("ranking helpers", () => {
     expect(results.alternates.length).toBeGreaterThan(0);
   });
 
-  it("uses a 24-port access switch for 1-8 port requests when the exception is disabled", () => {
+  it("uses the compact exception automatically for small port requests when it qualifies", () => {
     const results = rankSwitches(switches, {
       ...defaultFilters,
       copperPortsNeeded: 6,
       minimumPoeBudget: 200,
       minimumSfpPlusCount: 2,
-    });
-
-    expect(results.recommended[0]?.switch.model).toBe("M4350-24G4XF");
-  });
-
-  it("promotes the approved 8-port exception when allowed and sized correctly", () => {
-    const results = rankSwitches(switches, {
-      ...defaultFilters,
-      copperPortsNeeded: 6,
-      minimumPoeBudget: 200,
-      minimumSfpPlusCount: 2,
-      allowSmallInstallException: true,
     });
 
     expect(results.recommended[0]?.switch.model).toBe("M4250-8G2XF-PoE+");
+  });
+
+  it("falls back to a rear-facing 24-port access switch when the compact option misses hard requirements", () => {
+    const results = rankSwitches(switches, {
+      ...defaultFilters,
+      copperPortsNeeded: 6,
+      minimumPoeBudget: 300,
+      minimumSfpPlusCount: 4,
+    });
+
+    expect(results.recommended[0]?.switch.model).toBe("M4350-24G4XF");
   });
 
   it("recommends a 48-port class model for larger access requests", () => {
@@ -69,7 +68,6 @@ describe("ranking helpers", () => {
     expect(
       evaluateHardRequirements(smallException!, {
         ...defaultFilters,
-        allowSmallInstallException: true,
       }),
     ).toContain("Provides 2x SFP+ uplinks, below the 4x minimum.");
   });
@@ -88,8 +86,7 @@ describe("ranking helpers", () => {
 
     expect(coreSwitch).toBeDefined();
     expect(evaluateHardRequirements(coreSwitch!, defaultFilters)).toContain(
-      "Core / aggregation models are hidden unless explicitly enabled.",
+      "This streamlined selector only recommends access-layer switches.",
     );
   });
 });
-

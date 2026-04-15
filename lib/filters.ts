@@ -8,11 +8,6 @@ export const poeRank = {
 
 const booleanKeys = new Set<keyof SelectorFilters>([
   "poeRequired",
-  "rearFacingOnly",
-  "rj45Only",
-  "multigigPreferred",
-  "allowSmallInstallException",
-  "includeCoreAggregation",
 ]);
 
 const numberKeys = new Set<keyof SelectorFilters>([
@@ -27,21 +22,13 @@ export function getAccessCopperPorts(switchModel: SwitchModel) {
 
 export function getAvailableCopperPorts(
   switchModel: SwitchModel,
-  includeCoreAggregation: boolean,
 ) {
-  if (switchModel.category === "core_aggregation" && includeCoreAggregation) {
-    return switchModel.copper1G + switchModel.copperMultigig + switchModel.copper10G;
-  }
-
   return getAccessCopperPorts(switchModel);
 }
 
-export function getPreferredPortClass(
-  copperPortsNeeded: number,
-  allowSmallInstallException: boolean,
-) {
+export function getPreferredPortClass(copperPortsNeeded: number) {
   if (copperPortsNeeded <= 8) {
-    return allowSmallInstallException ? 8 : 24;
+    return 8;
   }
 
   if (copperPortsNeeded <= 24) {
@@ -82,8 +69,7 @@ export function canUseFrontFacingException(
   filters: SelectorFilters,
 ) {
   return (
-    filters.rearFacingOnly &&
-    filters.allowSmallInstallException &&
+    filters.copperPortsNeeded <= 8 &&
     isSmallInstallExceptionModel(switchModel)
   );
 }
@@ -92,7 +78,7 @@ export function getPortOversize(
   switchModel: SwitchModel,
   filters: SelectorFilters,
 ) {
-  return getAvailableCopperPorts(switchModel, filters.includeCoreAggregation) - filters.copperPortsNeeded;
+  return getAvailableCopperPorts(switchModel) - filters.copperPortsNeeded;
 }
 
 export function parseFilters(
@@ -156,17 +142,14 @@ export function evaluateHardRequirements(
   filters: SelectorFilters,
 ) {
   const reasons: string[] = [];
-  const availableCopperPorts = getAvailableCopperPorts(
-    switchModel,
-    filters.includeCoreAggregation,
-  );
+  const availableCopperPorts = getAvailableCopperPorts(switchModel);
 
   if (!switchModel.approved) {
     reasons.push("Model is not on the approved internal list.");
   }
 
-  if (switchModel.category === "core_aggregation" && !filters.includeCoreAggregation) {
-    reasons.push("Core / aggregation models are hidden unless explicitly enabled.");
+  if (switchModel.category === "core_aggregation") {
+    reasons.push("This streamlined selector only recommends access-layer switches.");
   }
 
   if (
@@ -174,13 +157,6 @@ export function evaluateHardRequirements(
     getAccessCopperPorts(switchModel) === 16
   ) {
     reasons.push("16-port specialty switches are outside the standard access catalog.");
-  }
-
-  if (
-    isSmallInstallExceptionModel(switchModel) &&
-    !filters.allowSmallInstallException
-  ) {
-    reasons.push("Small-install exception models are disabled in the current filters.");
   }
 
   if (availableCopperPorts < filters.copperPortsNeeded) {
@@ -211,14 +187,14 @@ export function evaluateHardRequirements(
   }
 
   if (
-    filters.rearFacingOnly &&
+    switchModel.category === "access" &&
     switchModel.orientation === "front-facing" &&
     !canUseFrontFacingException(switchModel, filters)
   ) {
-    reasons.push("Front-facing layout conflicts with the current rear-facing-only rule.");
+    reasons.push("Front-facing layouts are limited to the approved compact small-room exception.");
   }
 
-  if (filters.rj45Only && switchModel.connectorStyle !== "RJ45") {
+  if (switchModel.connectorStyle !== "RJ45") {
     reasons.push("Connector style is not RJ45, so it is excluded from endpoint access recommendations.");
   }
 

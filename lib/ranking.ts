@@ -38,11 +38,9 @@ function isSmallestQualifiedFit(
   qualified: SwitchModel[],
   filters: SelectorFilters,
 ) {
-  const currentPorts = getAvailableCopperPorts(switchModel, filters.includeCoreAggregation);
+  const currentPorts = getAvailableCopperPorts(switchModel);
   const minPorts = Math.min(
-    ...qualified.map((candidate) =>
-      getAvailableCopperPorts(candidate, filters.includeCoreAggregation),
-    ),
+    ...qualified.map((candidate) => getAvailableCopperPorts(candidate)),
   );
 
   return currentPorts === minPorts;
@@ -54,10 +52,7 @@ function scoreSwitch(
   qualified: SwitchModel[],
 ) {
   let score = 100;
-  const targetClass = getPreferredPortClass(
-    filters.copperPortsNeeded,
-    filters.allowSmallInstallException,
-  );
+  const targetClass = getPreferredPortClass(filters.copperPortsNeeded);
   const switchClass = getSwitchPortClass(switchModel);
   const oversize = getPortOversize(switchModel, filters);
 
@@ -88,14 +83,6 @@ function scoreSwitch(
     score -= 25;
   }
 
-  if (switchModel.category === "core_aggregation") {
-    score -= 20;
-  }
-
-  if (filters.multigigPreferred && switchModel.copperMultigig > 0) {
-    score += 8;
-  }
-
   if (switchClass !== 0 && switchClass === targetClass) {
     score += 40;
   } else if (switchClass !== 0) {
@@ -103,7 +90,7 @@ function scoreSwitch(
   }
 
   if (filters.copperPortsNeeded <= 8 && switchModel.allowForSmallInstalls) {
-    score += 18;
+    score += 24;
   }
 
   score -= Math.max(0, oversize);
@@ -173,32 +160,17 @@ export function rankSwitches(
   const recommended = qualifiedResults.filter(
     (result) => result.switch.category === "access",
   );
-  const coreMatches = qualifiedResults.filter(
-    (result) => result.switch.category === "core_aggregation",
-  );
 
-  let guidance: string | null = null;
-
-  if (recommended.length === 0 && !filters.includeCoreAggregation) {
-    const hiddenCoreMatches = switchModels
-      .filter((switchModel) => switchModel.category === "core_aggregation")
-      .filter((switchModel) => {
-        const relaxedFilters = { ...filters, includeCoreAggregation: true };
-        return evaluateHardRequirements(switchModel, relaxedFilters).length === 0;
-      });
-
-    if (hiddenCoreMatches.length > 0) {
-      guidance =
-        "No access-layer switch meets the current constraints. If this design is intended for transport, backbone, or aggregation duties, enable core / aggregation models to review those options separately.";
-    }
-  }
+  const guidance =
+    filters.copperPortsNeeded <= 8
+      ? "Rear-facing access models stay prioritized by default, but the approved compact 8-port exception is automatically considered for very small rooms."
+      : "This streamlined view stays focused on rear-facing RJ45 access switches from the approved internal list.";
 
   const alternates = recommended.slice(1);
 
   return {
     recommended: recommended.slice(0, 1),
     alternates,
-    coreMatches,
     disqualified: sortResults(disqualified),
     guidance,
   };
@@ -212,13 +184,10 @@ export function getCatalogGroups(switchModels: SwitchModel[]) {
 }
 
 export function getRecommendationBanner(filters: SelectorFilters) {
-  const portClass = getPreferredPortClass(
-    filters.copperPortsNeeded,
-    filters.allowSmallInstallException,
-  );
+  const portClass = getPreferredPortClass(filters.copperPortsNeeded);
 
-  if (filters.copperPortsNeeded <= 8 && filters.allowSmallInstallException) {
-    return "Small-install exception is enabled, so compact approved models can be recommended first.";
+  if (filters.copperPortsNeeded <= 8) {
+    return "Compact requests automatically consider the approved 8-port exception first, then fall back to rear-facing access switches if needed.";
   }
 
   if (portClass === 24) {

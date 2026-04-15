@@ -8,14 +8,14 @@ export default function CatalogPage() {
 
   return (
     <div className="space-y-8">
-      <section className="rounded-[32px] border border-slate-900/10 bg-[color:var(--surface)] p-6">
-        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-900/75">
+      <section className="rounded-[32px] border border-slate-800 bg-slate-950/70 p-6 shadow-[0_24px_80px_rgba(2,6,23,0.45)] backdrop-blur-xl">
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-sky-200/60">
           Approved list
         </p>
-        <h2 className="mt-2 font-[family-name:var(--font-display)] text-4xl font-semibold tracking-tight text-slate-950">
+        <h2 className="mt-2 font-[family-name:var(--font-display)] text-4xl font-semibold tracking-tight text-slate-50">
           Internal approved Netgear catalog
         </h2>
-        <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-700">
+        <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
           Catalog view groups approved switches by role so access-layer options stay
           distinct from core / aggregation gear during AV system design.
         </p>
@@ -23,10 +23,10 @@ export default function CatalogPage() {
 
       <section className="space-y-4">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-900/75">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-sky-200/60">
             Access switches
           </p>
-          <h3 className="mt-1 font-[family-name:var(--font-display)] text-3xl font-semibold tracking-tight text-slate-950">
+          <h3 className="mt-1 font-[family-name:var(--font-display)] text-3xl font-semibold tracking-tight text-slate-50">
             Room and rack access models
           </h3>
         </div>
@@ -46,13 +46,13 @@ export default function CatalogPage() {
 
       <section className="space-y-4">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-sky-900/75">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-sky-200/60">
             Core / aggregation switches
           </p>
-          <h3 className="mt-1 font-[family-name:var(--font-display)] text-3xl font-semibold tracking-tight text-slate-950">
+          <h3 className="mt-1 font-[family-name:var(--font-display)] text-3xl font-semibold tracking-tight text-slate-50">
             Backbone and transport models
           </h3>
-          <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">
+          <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-300">
             These models are intentionally separated so nobody mistakes a core switch
             for a normal room-rack endpoint switch.
           </p>
@@ -73,4 +73,3 @@ export default function CatalogPage() {
     </div>
   );
 }
-

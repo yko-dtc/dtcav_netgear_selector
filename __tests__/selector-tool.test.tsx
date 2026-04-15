@@ -18,9 +18,9 @@ describe("selector UI", () => {
       />,
     );
 
-    expect(screen.getByText("Recommended switch")).toBeInTheDocument();
+    expect(screen.getByText("Recommended")).toBeInTheDocument();
     expect(screen.getByText("M4350-24G4XF")).toBeInTheDocument();
-    expect(screen.getByText("Alternate approved matches")).toBeInTheDocument();
+    expect(screen.getByText("Other approved fits")).toBeInTheDocument();
   });
 
   it("surfaces the 8-port exception when the filters allow it", () => {
@@ -31,7 +31,6 @@ describe("selector UI", () => {
           copperPortsNeeded: 6,
           minimumPoeBudget: 200,
           minimumSfpPlusCount: 2,
-          allowSmallInstallException: true,
         }}
         onNumberChange={noop}
         onBooleanChange={noop}
@@ -41,7 +40,7 @@ describe("selector UI", () => {
     );
 
     const recommendationSection = screen
-      .getByText("Recommended switch")
+      .getByText("Recommended")
       .closest("section");
 
     expect(recommendationSection).not.toBeNull();
@@ -63,16 +62,27 @@ describe("selector UI", () => {
     expect(screen.getByText("Image coming soon")).toBeInTheDocument();
   });
 
-  it("keeps core / aggregation matches in a separate section", () => {
+  it("opens a modal when a switch card is clicked", () => {
+    render(
+      <SwitchCard
+        model={switches[0]}
+        matchReasons={["Approved for compact installs."]}
+        watchOuts={["Front-facing exception for compact rooms."]}
+        summary="Recommended: M4250-8G2XF-PoE+ because it fits compact rooms."
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: /View details for M4250-8G2XF-PoE\+/i }));
+
+    expect(screen.getByRole("dialog")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Close" })).toBeInTheDocument();
+    expect(screen.getByText("Watch-outs")).toBeInTheDocument();
+  });
+
+  it("does not show a core / aggregation section in the streamlined selector", () => {
     render(
       <SelectorTool
-        filters={{
-          ...defaultFilters,
-          includeCoreAggregation: true,
-          copperPortsNeeded: 24,
-          minimumPoeBudget: 300,
-          minimumSfpPlusCount: 4,
-        }}
+        filters={defaultFilters}
         onNumberChange={noop}
         onBooleanChange={noop}
         onPoeTypeChange={noop}
@@ -80,8 +90,7 @@ describe("selector UI", () => {
       />,
     );
 
-    expect(screen.getByText("Core / aggregation candidates")).toBeInTheDocument();
-    expect(screen.getByText("M4350-24X4V")).toBeInTheDocument();
+    expect(screen.queryByText("Core / aggregation candidates")).not.toBeInTheDocument();
   });
 
   it("keeps the excluded models list collapsed by default", () => {

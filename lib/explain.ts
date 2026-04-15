@@ -13,14 +13,8 @@ export function buildRecommendationReasons(
   filters: SelectorFilters,
 ) {
   const reasons: string[] = [];
-  const availableCopperPorts = getAvailableCopperPorts(
-    switchModel,
-    filters.includeCoreAggregation,
-  );
-  const requestedPortClass = getPreferredPortClass(
-    filters.copperPortsNeeded,
-    filters.allowSmallInstallException,
-  );
+  const availableCopperPorts = getAvailableCopperPorts(switchModel);
+  const requestedPortClass = getPreferredPortClass(filters.copperPortsNeeded);
   const switchPortClass = getSwitchPortClass(switchModel);
 
   reasons.push(
@@ -57,12 +51,8 @@ export function buildRecommendationReasons(
     reasons.push(`Matches the preferred ${requestedPortClass}-port class for this design size.`);
   }
 
-  if (filters.multigigPreferred && switchModel.copperMultigig > 0) {
-    reasons.push("Includes multigig copper ports, matching the current preference.");
-  }
-
-  if (switchModel.category === "core_aggregation") {
-    reasons.push("Eligible only because core / aggregation models are explicitly included.");
+  if (filters.copperPortsNeeded <= 8 && isSmallInstallExceptionModel(switchModel)) {
+    reasons.push("Automatically surfaced because the request falls into the compact small-room range.");
   }
 
   return reasons;
@@ -88,16 +78,8 @@ export function buildWatchOuts(
     );
   }
 
-  if (switchModel.category === "core_aggregation") {
-    watchOuts.push("Core / aggregation models are visually separated to avoid accidental access-layer selection.");
-  }
-
   if (switchModel.connectorStyle === "QSFP28") {
     watchOuts.push("QSFP28 uplinks are not interchangeable with SFP+ in this selector.");
-  }
-
-  if (filters.multigigPreferred && switchModel.copperMultigig === 0) {
-    watchOuts.push("No multigig copper ports are available even though multigig is preferred.");
   }
 
   return Array.from(new Set(watchOuts));

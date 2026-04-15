@@ -10,21 +10,21 @@ export function DisqualifiedList({ items }: DisqualifiedListProps) {
   }
 
   return (
-    <details className="rounded-[28px] border border-slate-900/10 bg-[color:var(--surface)] p-5">
-      <summary className="cursor-pointer list-none text-lg font-semibold text-slate-950">
+    <details className="rounded-[32px] border border-slate-800 bg-slate-950/65 p-5 shadow-[0_18px_60px_rgba(2,6,23,0.4)] backdrop-blur-xl">
+      <summary className="cursor-pointer list-none text-lg font-semibold text-slate-50">
         Excluded models ({items.length})
       </summary>
-      <p className="mt-2 text-sm text-slate-600">
+      <p className="mt-2 text-sm leading-6 text-slate-400">
         Expanded for transparency when you need to explain why a model was held back.
       </p>
       <div className="mt-4 grid gap-4">
         {items.map((item) => (
           <div
             key={item.switch.model}
-            className="rounded-2xl border border-slate-900/8 bg-white/80 p-4"
+            className="rounded-2xl border border-slate-800 bg-slate-900/80 p-4"
           >
-            <p className="font-semibold text-slate-900">{item.switch.model}</p>
-            <ul className="mt-2 space-y-2 text-sm text-slate-700">
+            <p className="font-semibold text-slate-100">{item.switch.model}</p>
+            <ul className="mt-2 space-y-2 text-sm leading-6 text-slate-300">
               {item.disqualifiedReasons.map((reason) => (
                 <li key={reason}>- {reason}</li>
               ))}
